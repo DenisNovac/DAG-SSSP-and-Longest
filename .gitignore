@@ -1,0 +1,7 @@
+*~
+.idea
+.code
+.metals
+target
+*assignment.sbt
+*.class
