@@ -23,10 +23,12 @@ object Main extends App {
 
   println()
   //SSSP.calculateSsspOnDag(topOrder)
-  SSSP.calculateLongestPathOnDag(topOrder)
+  val longest = SSSP.calculateLongestPathOnDag(topOrder)
+  println(longest.foldRight(0)((e, acc) => e.score + acc) * -1)
 
-  println()
-  Old.calcLongestFromAll(graph)
+  /*println()
+  val longest_old = Old.calcLongestFromAll(graph)
+  println(longest_old.score)*/
 
   //val sssp = SSSP.calculateSsspOnDag(graph, topOrder, Start())
 }
