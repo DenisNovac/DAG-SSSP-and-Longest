@@ -3,6 +3,7 @@ package app
 import app.GraphBuilder.DAG
 
 object SSSP {
+  val INF: Int = 999_999
 
   /**
     * Топологическая сортировка (Topological Sort, TopSort):
@@ -57,8 +58,6 @@ object SSSP {
     topOrder
   }
 
-
-
   /**
     * Найти кратчайший путь от старта до всех узлов графа (Single Source Shortest Path(SSSP)):
     *
@@ -87,14 +86,14 @@ object SSSP {
     * https://youtu.be/TXkDpqjDMHA
     * @param topOrder Направленный ациклический граф
     */
-  private def calculateSomeOnDag(topOrder: List[LinkedNode], name: String, inf: Int) = {
-    val t0 = System.nanoTime()
+  private def calculateSomeOnDag(topOrder: List[LinkedNode], name: String) = {
+    val t0           = System.nanoTime()
     var countOfEdges = 0
 
     // Заполняем дистанции большим числом для сравнения
     val bestScores: collection.mutable.Map[AbstractNode, ScoredRoute] = collection.mutable.Map() ++
       topOrder.map { ln =>
-        ln.node -> ScoredRoute(inf, List.empty[Edge])
+        ln.node -> ScoredRoute(INF, List.empty[Edge])
       }.toMap
 
     // Первая дистанция - дистанция до старта, она равна нулю
@@ -131,12 +130,14 @@ object SSSP {
       val pathTo: ScoredRoute = bestScores(right)
 
       pathTo.route match {
-        case list if list.nonEmpty =>
-          val edge: Edge                  = pathTo.route.head
+        case Nil => ()
+
+        case list =>
+          val edge: Edge                  = list.head
           val nodeAtTheLeft: AbstractNode = edge.left
           recFoldBestRoutes(nodeAtTheLeft)
           route += edge
-        case Nil => ()
+
       }
     }
 
@@ -144,28 +145,22 @@ object SSSP {
     println(s"Edges passed $countOfEdges")
     println(s"$name path found in ${(System.nanoTime() - t0) / 1000000} ms")
 
-    val first = topOrder.head.links.filter(_.right == route.head.left).head
-    val result = first +: route
+    println(route.mkString("\n"))
 
-    println(result.mkString("\n"))
-
-    result.toList
+    route.toList
   }
 
-
-  def calculateSsspOnDag(topOrder: List[LinkedNode]) = calculateSomeOnDag(topOrder, "Shortest", 999_999)
-
+  def calculateSsspOnDag(topOrder: List[LinkedNode]) = calculateSomeOnDag(topOrder, "Shortest")
 
   def calculateLongestPathOnDag(topOrder: List[LinkedNode]) = {
 
     val reversedTopOrder = topOrder.map { ln =>
-      val node = ln.node
+      val node          = ln.node
       val edgesReversed = ln.links.map(edge => Edge(edge.left, edge.right, edge.score * -1))
       LinkedNode(node, edgesReversed)
     }
 
-    calculateSomeOnDag(reversedTopOrder, "Longest", -999_999)
+    calculateSomeOnDag(reversedTopOrder, "Longest")
   }
-
 
 }
